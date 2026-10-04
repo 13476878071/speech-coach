@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Speech Coach 帮你观察英语句子里可能的重读、连读和弱读。"
+    />
+    <title>Speech Coach — 英语自然语流小教练</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="site-header">
+        <div class="brand" aria-label="Speech Coach">
+          <span class="brand-icon" aria-hidden="true">✳</span>
+          <span>Speech Coach</span>
+        </div>
+        <span class="header-note">把英语说得更自然</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">一句话，听出节奏</p>
+        <h1 id="page-title">看看这句话<br /><em>怎么自然地说。</em></h1>
+        <p class="hero-copy">
+          输入一句英文，找出可能的重读、连读和弱读。先看懂语流，再慢慢练习。
+        </p>
+      </section>
+
+      <section class="input-card" aria-labelledby="input-title">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">01 / 输入句子</p>
+            <h2 id="input-title">你想练哪一句？</h2>
+          </div>
+          <span class="hint">建议输入一个简短的句子</span>
+        </div>
+        <form id="sentence-form">
+          <label class="sr-only" for="sentence-input">英文句子</label>
+          <textarea
+            id="sentence-input"
+            name="sentence"
+            rows="3"
+            maxlength="200"
+            spellcheck="true"
+            placeholder="例如：I want to go to the store."
+            aria-describedby="input-help input-error"
+          ></textarea>
+          <div class="form-footer">
+            <p id="input-help" class="input-help">试试：<button id="example-button" type="button" class="text-button">I want to go to the store.</button></p>
+            <button class="primary-button" type="submit">分析句子 <span aria-hidden="true">↗</span></button>
+          </div>
+          <p id="input-error" class="input-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
+        <div class="results-heading">
+          <div>
+            <p class="step-label">02 / 观察语流</p>
+            <h2 id="results-title">How to say it</h2>
+          </div>
+          <span id="analysis-source" class="estimate-badge">本地规则分析</span>
+        </div>
+
+        <article class="how-card">
+          <div class="card-heading">
+            <span class="number-chip">01</span>
+            <h3>自然说法示意</h3>
+          </div>
+          <p class="card-intro">深绿色是主要重读，浅绿色是次要重读；实际强调会随语境改变。</p>
+          <div id="marked-sentence" class="marked-sentence" aria-label="句子重读示意"></div>
+          <div class="audio-controls" aria-label="语音试听">
+            <button id="natural-audio" class="audio-button" type="button" aria-describedby="audio-caption"><span aria-hidden="true">▶</span> Natural</button>
+            <button id="slow-audio" class="audio-button audio-button-secondary" type="button" aria-describedby="audio-caption"><span aria-hidden="true">▶</span> Slow</button>
+          </div>
+          <p id="audio-caption" class="audio-caption">Audio Preview · 使用浏览器语音合成，仅供试听；声音不一定体现上面的重读、连读或缩读。</p>
+          <p id="audio-status" class="audio-status" role="status" aria-live="polite"></p>
+        </article>
+
+        <div class="detail-grid">
+          <article class="detail-card">
+            <div class="card-heading">
+              <span class="number-chip">02</span>
+              <h3>重读词</h3>
+            </div>
+            <p class="card-intro">先抓住主要信息，再带出较轻的词。</p>
+            <div id="stress-list" class="detail-list"></div>
+          </article>
+
+          <article class="detail-card">
+            <div class="card-heading">
+              <span class="number-chip">03</span>
+              <h3>可能的连读</h3>
+            </div>
+            <p class="card-intro">相邻的词有时会顺着接在一起。</p>
+            <div id="linking-list" class="detail-list"></div>
+          </article>
+
+          <article class="detail-card">
+            <div class="card-heading">
+              <span class="number-chip">04</span>
+              <h3>弱读与缩读</h3>
+            </div>
+            <p class="card-intro">不重读的小词，常常读得更轻、更短。</p>
+            <div id="reduction-list" class="detail-list"></div>
+          </article>
+        </div>
+
+        <article class="summary-card">
+          <div class="summary-icon" aria-hidden="true">✦</div>
+          <div>
+            <h3>自然地说</h3>
+            <p id="summary-text"></p>
+            <p id="rhythm-text" class="rhythm-text"></p>
+          </div>
+        </article>
+        <p class="disclaimer">提示基于常见美式英语语流规律；实际读法会随语境、强调和口音变化。</p>
+      </section>
+
+      <footer class="site-footer">Speech Coach <span aria-hidden="true">·</span> 从一句话开始练习</footer>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
