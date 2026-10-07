@@ -17,9 +17,11 @@ const audioStatus = document.querySelector("#audio-status");
 const naturalButton = document.querySelector("#natural-audio");
 const slowButton = document.querySelector("#slow-audio");
 const exampleButton = document.querySelector("#example-button");
+const submitButtonContent = [...submitButton.childNodes];
 
 let currentSentence = "";
 let latestRequest = 0;
+let isAnalyzing = false;
 
 function renderMarkedSentence(sentence, tokens) {
   markedSentence.replaceChildren();
@@ -117,20 +119,23 @@ function showError(message) {
   error.textContent = message;
   error.hidden = false;
   results.hidden = true;
-  submitButton.disabled = false;
   stopAudioPreview();
   input.focus();
 }
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (isAnalyzing) return;
   const requestId = ++latestRequest;
   const sentence = input.value.trim();
   if (!sentence) return showError("请先输入一句英文。");
   if (!/[A-Za-z]/.test(sentence)) return showError("请输入包含英文字母的句子。");
 
   error.hidden = true;
+  isAnalyzing = true;
   submitButton.disabled = true;
+  submitButton.replaceChildren("正在分析…");
+  submitButton.setAttribute("aria-busy", "true");
   try {
     const analysis = await analyzeSentence(sentence);
     if (requestId !== latestRequest) return;
@@ -143,7 +148,10 @@ form.addEventListener("submit", async (event) => {
   } catch {
     if (requestId === latestRequest) showError("分析暂时不可用，请稍后重试。");
   } finally {
-    if (requestId === latestRequest) submitButton.disabled = false;
+    isAnalyzing = false;
+    submitButton.disabled = false;
+    submitButton.replaceChildren(...submitButtonContent);
+    submitButton.removeAttribute("aria-busy");
   }
 });
 

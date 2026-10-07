@@ -1,16 +1,20 @@
-# Speech Coach V0.2
+# Speech Coach V0.3
 
-一个无需框架、后端或账号的英语语流练习网页。输入一句英文，页面会用本地规则提示可能的重读、连读、弱读、缩读和节奏。
+一个无需框架或账号的英语语流练习网页。输入一句英文，页面会优先通过服务端 AI 分析可能的重读、连读、弱读、缩读和节奏；AI 请求失败时自动使用本地规则分析。
 
 ## 本地运行
 
-在项目目录启动静态服务器：
+在 Windows PowerShell 中运行：
 
-```sh
-python -m http.server 8000
+```powershell
+cd D:\Project.zhe\speech-coach
+$env:KIMI_API_KEY = Read-Host "Kimi API key"
+node server.mjs
 ```
 
-然后打开 `http://localhost:8000`。如果电脑没有 Python，可以用编辑器的静态网页预览功能。页面使用 JavaScript 模块，因此不要直接双击 `index.html`。
+然后打开 `http://127.0.0.1:8000`。`server.mjs` 同时提供网页和 `/api/analyze` 接口；页面使用 JavaScript 模块，因此不要直接双击 `index.html`。
+
+API Key 只放在服务端环境变量 `KIMI_API_KEY` 中。不要把 API Key 写进前端代码、README 或提交到 Git。
 
 试试以下句子：
 
@@ -23,13 +27,14 @@ python -m http.server 8000
 ## 文件和数据流
 
 1. `index.html` 提供输入框和结果区域，`styles.css` 控制外观。
-2. `app.js` 读取输入，调用 `analysis-service.js`，再把结果显示在页面上。
-3. `analysis-service.js` 是统一分析入口。目前只调用 `analyzer.js` 的本地规则；将来可改为调用自己的服务端，并在失败时保留本地备用分析。
-4. `analyzer.js` 产生结构化结果，包括词语位置、三级重读、弱读、缩读、连读、节奏和解释。
-5. `audio.js` 负责浏览器语音预览，与分析结果分开。以后如使用生成音频，可以替换这一层。
+2. 分析链路：browser → `analysis-service.js` → `POST /api/analyze` → `server.mjs` → Kimi K2.6 → AI annotation → server assembly → `AnalysisResult` → `app.js`。服务端校验 AI 注释，并组装句子、词语位置和最终结果；`app.js` 将结果显示在页面上。
+3. AI 请求失败或返回无效结果时，`analysis-service.js` 自动 fallback 到 `analyzer.js` 的本地分析。它同样产生词语位置、三级重读、弱读、缩读、连读、节奏和解释。
+4. `audio.js` 负责浏览器语音预览，与分析结果分开。以后如使用生成音频，可以替换这一层。
+
+当前服务端 Kimi 配置：model 为 `kimi-k2.6`，thinking 为 `disabled`，`max_tokens` 为 `2048`，AI 请求 timeout 为 120 秒。
 
 `stress` 有 `primary`（主要重读）、`secondary`（次要重读）和 `unstressed`（不重读）三个值。所有提示都指向句子里的词语位置，页面不必从一段文字中猜测该标记哪个词。
 
 ## 当前边界
 
-本地规则只提供学习线索，并不能真正理解说话人的意图或语境；连读提示尤其是基于拼写的粗略判断。要获得更准确的语境分析，未来需要通过服务端安全调用 AI 模型，并检查它是否返回统一的数据格式。若要让音频严格匹配分析结果，还需要额外的音频生成方案。项目目前没有后端、API 密钥或付费服务。
+AI 分析是语流练习提示，具体重读和连读仍取决于语境与说话人。fallback 使用的本地规则只提供学习线索，并不能真正理解说话人的意图；连读提示尤其是基于拼写的粗略判断。若要让音频严格匹配页面分析结果，还需要额外的音频生成方案。
